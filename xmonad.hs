@@ -15,6 +15,8 @@ import System.Exit
 import XMonad.Hooks.ManageDocks
 import XMonad.Util.Run
 import XMonad.Util.SpawnOnce
+import XMonad.Layout.Spacing
+import XMonad.Hooks.EwmhDesktops
 
 import qualified XMonad.StackSet as W
 import qualified Data.Map        as M
@@ -56,8 +58,8 @@ myWorkspaces    = ["1","2","3","4","5","6","7","8","9"]
 
 -- Border colors for unfocused and focused windows, respectively.
 --
-myNormalBorderColor  = "#dddddd"
-myFocusedBorderColor = "#ff0000"
+myNormalBorderColor  = "#2806ad"
+myFocusedBorderColor = "#e64553"
 
 ------------------------------------------------------------------------
 -- Key bindings. Add, modify or remove key bindings here.
@@ -68,7 +70,7 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
     [ ((modm .|. shiftMask, xK_Return), spawn $ XMonad.terminal conf)
 
     -- launch dmenu
-    , ((modm,               xK_p     ), spawn "dmenu_run")
+    , ((modm,               xK_p     ), spawn "rofi -show drun")
 
     -- launch gmrun
     , ((modm .|. shiftMask, xK_p     ), spawn "gmrun")
@@ -186,8 +188,9 @@ myMouseBindings (XConfig {XMonad.modMask = modm}) = M.fromList $
 -- The available layouts.  Note that each layout is separated by |||,
 -- which denotes layout choice.
 --
-myLayout = avoidStruts (tiled ||| Mirror tiled ||| Full)
-  where
+myLayout = avoidStruts (spacing 8 $ tiled ||| spacing 8 (Mirror tiled) ||| Full)  
+
+	where
      -- default tiling algorithm partitions the screen into two panes
      tiled   = Tall nmaster delta ratio
 
@@ -251,6 +254,7 @@ myLogHook = return ()
 myStartupHook = do
 	spawnOnce "nitrogen --restore"
 	spawnOnce "picom"
+	spawnOnce "xsetroot -cursor_name left_ptr"
 
 ------------------------------------------------------------------------
 -- Now run xmonad with all the defaults we set up.
@@ -258,8 +262,8 @@ myStartupHook = do
 -- Run xmonad with the settings you specify. No need to modify this.
 --
 main = do
-  xmproc <- spawnPipe "xmobar /home/chris/.config/xmobar/xmobarrc"
-  xmonad $ docks defaults
+  xmproc <- spawnPipe "/home/chris/.config/polybar/launch.sh"
+  xmonad $ ewmh $ docks defaults
 -- A structure containing your configuration settings, overriding
 -- fields in the default config. Any you don't override, will
 -- use the defaults defined in xmonad/XMonad/Config.hs
